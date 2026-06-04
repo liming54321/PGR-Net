@@ -1,84 +1,151 @@
-# 1. 介绍
+# PGR-Net
 
-Image Shadow Removal
+Official implementation of **Progressive Global-to-Local Image Restoration for Structure-Preserving Shadow Removal**.
 
-# 2. 环境
+This repository provides the implementation, configuration files, inference scripts, evaluation code, and pretrained models for reproducing the main experimental results reported in our paper.
 
-## 2.1. 使用服务器环境
+---
 
-### 2.1.1. Python
+## 1. Environment
 
-Python: 3.9.12
+### 1.1 Create Conda Environment
 
-```shell
-conda create -n istd python=3.9.12
+```bash
+conda create -n PGR python=3.9.12
+conda activate PGR
 ```
 
-### 2.1.2. 安装依赖
+### 1.2 Install PyTorch 1.10.0 + CUDA 11.1
 
+```bash
+conda install pytorch==1.10.0 torchvision==0.11.1 torchaudio==0.10.0 cudatoolkit=11.1 -c pytorch -c nvidia
+```
 
-```shell
+### 1.3 Install Dependencies
+
+```bash
 pip install -r requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
-# 3. 开始使用
+---
 
-## 3.1. 初始化代码
+## 2. Dataset Preparation
 
+We use the **ISTD** and **SRD** datasets for shadow removal evaluation. In our experiments, all images are resized to **256 × 256**.
 
-* 初始化checkpoints和results存储路径（xxx为名字）
+Please download the datasets from the following links:
 
-```shell
-# 服务器环境
-mkdir -p /home/user/ckpt_save_path/checkpoints
-mkdir -p /home/user/result_save_path/results
-ln -s /home/user/ckpt_save_path/checkpoints checkpoints
-ln -s /home/user/result_save_path/results results
+* ISTD dataset: [Download link](PUT_ISTD_DATASET_LINK_HERE)
+* SRD dataset: [Download link](PUT_SRD_DATASET_LINK_HERE)
 
+Please organize the ISTD dataset as follows:
+
+```text
+Datasets/
+└── ISTD/
+    ├── train/
+    │   ├── input/
+    │   ├── target/
+    │   └── mask/
+    └── test/
+        ├── input/
+        ├── target/
+        └── mask/
 ```
 
-## 3.2. 训练
+Please organize the SRD dataset as follows:
 
+```text
+Datasets/
+└── SRD/
+    ├── train/
+    │   ├── input/
+    │   ├── target/
+    │   └── mask/
+    └── test/
+        ├── input/
+        ├── target/
+        └── mask/
 ```
-easytrain -c configs/cfg_DGUNet_shadowFormer.py --gpus 0,1,2
+
+For SRD, the original dataset provides paired shadow and shadow-free images but does not provide official manually annotated shadow masks. Following the baseline setting, we use the **DHAN-generated SRD masks** adopted in the baseline implementation. The masks should be placed in the corresponding `mask/` folders and should have filenames consistent with the input images.
+
+---
+
+## 3. Training
+
+To train the model, run:
+
+```bash
+easytrain -c configs/cfg_DGUNet_shadowFormer.py --gpus 0,1
 ```
 
-## 3.4. 推理测试集图像生成结果图
+Before training, please modify the dataset paths, checkpoint path, batch size, and GPU settings in the configuration file according to your environment.
 
-每次修改`infer_ISTD_image.sh`中config和存储目录，设置推理使用的GPU：
+---
 
-```shell
+## 4. Pretrained Models
 
-CONFIG= configs/cfg_DGUNet_shadowFormer.py
-OUTPUT_NAME=  DGUNet_shadowFormer  # 结果文件夹名字（不是完整路径，只填文件夹名字即可）
-CKPT_NAME= # 权重文件路径
+The pretrained models can be downloaded from the following links:
+
+| Dataset | Pretrained Model                                    |
+| :-----: | :-------------------------------------------------- |
+|   ISTD  | [Google Drive](PUT_ISTD_PRETRAINED_MODEL_LINK_HERE) |
+|   SRD   | [Google Drive](PUT_SRD_PRETRAINED_MODEL_LINK_HERE)  |
+
+Please place the downloaded pretrained models under:
+
+```text
+checkpoints/
+├── pgrnet_istd.pth
+└── pgrnet_srd.pth
+```
+
+---
+
+## 5. Inference
+
+Before inference, please modify the following settings in `infer_ISTD_image.sh`:
+
+```bash
+CONFIG=configs/cfg_DGUNet_shadowFormer.py
+OUTPUT_NAME=test_name
+CKPT_NAME="checkpoints/pgrnet_istd.pth"
 INPUT_NAME=Datasets/ISTD/test/
-
 GPUS=0
 ```
 
-推理：
+Then run:
 
-```shell
-bash infer_test_image.sh
+```bash
+bash infer_ISTD_image.sh
 ```
 
-## 3.6. Tensorboard
+The restored images will be saved to the output directory specified by `OUTPUT_NAME`.
 
-```shell
-tensorboard --host 0.0.0.0 --logdir checkpoints
+---
+
+## 6. Evaluation
+
+We provide `evaluate2.m` to compute the quantitative metrics, including **RMSE**, **SSIM**, and **PSNR**.
+
+The evaluation script was tested with **MATLAB R2016**. Before running the script, please set the paths of the predicted results, ground-truth images, and shadow masks in `evaluate2.m`.
+
+For example:
+
+```matlab
+% Path to the predicted shadow-free images
+result_path = 'path/to/results';
+
+% Path to the ground-truth shadow-free images
+target_path = 'path/to/target';
+
+% Path to the shadow masks
+mask_path = 'path/to/mask';
 ```
 
-## 3.7. 模型信息（统计计算量、参数量）
+Then run `evaluate2.m` in MATLAB to obtain the evaluation results.
 
-```shell
-python scripts/model_info_dw.py --human -c configs/cfg_DGUNet_shadowFormer.py -i "1,3,256,256" "1,1,256,256"
-```
+## 7. Acknowledgements
 
-## 3.8. 性能评估（RMSE,SSIM,PSNR）
-
-Matlab 2016
-
-evaluate2.m
-
-mask路径，结果图路径，目标图路径
+This project uses the ISTD and SRD datasets. The SRD masks used in this repository follow the DHAN-generated masks adopted in the baseline implementation. We sincerely thank the authors of the related datasets and baseline methods for making their resources available to the research community.
