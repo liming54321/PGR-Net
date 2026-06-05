@@ -35,8 +35,8 @@ We use the **ISTD** and **SRD** datasets for shadow removal evaluation. In our e
 
 Please download the datasets from the following links:
 
-* ISTD dataset: [Download link](PUT_ISTD_DATASET_LINK_HERE)
-* SRD dataset: [Download link](PUT_SRD_DATASET_LINK_HERE)
+* ISTD dataset: [[Download link](https://drive.google.com/file/d/17_2AmU5ujm3uh-hNfSPJvOpVxFLcv87m/view?usp=drive_link))
+* SRD dataset: [Download link](https://drive.google.com/file/d/1Sv6yKBQAh3LCGVn16Zy66asuhRI3gVhQ/view?usp=drive_link)
 
 Please organize the ISTD dataset as follows:
 
@@ -90,8 +90,8 @@ The pretrained models can be downloaded from the following links:
 
 | Dataset | Pretrained Model                                    |
 | :-----: | :-------------------------------------------------- |
-|   ISTD  | [Google Drive](PUT_ISTD_PRETRAINED_MODEL_LINK_HERE) |
-|   SRD   | [Google Drive](PUT_SRD_PRETRAINED_MODEL_LINK_HERE)  |
+|   ISTD  | [Google Drive](https://drive.google.com/file/d/1Dfk0YW505j4hqo37_feXjFQDYXSKcn0h/view?usp=drive_link) |
+|   SRD   | [Google Drive](https://drive.google.com/file/d/1_KVokBCDRSEAUol85xR8gORHwxScoS39/view?usp=drive_link) |
 
 Please place the downloaded pretrained models under:
 
