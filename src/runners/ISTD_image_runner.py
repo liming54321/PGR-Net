@@ -194,9 +194,6 @@ class BaseISTDRunner(BaseImageRunner, metaclass=ABCMeta):
 
                 w = w_stage[j]
                 total_loss += w * (loss_main + edge_loss_weight * loss_grad)
-                if j == 0:
-                    self.update_epoch_meter('train/edge_loss', loss_grad.item())
-                    self.update_epoch_meter('train/psnr', self.metrics['psnr'](pred, target).item())
 
             self.backward(total_loss)
         for _ in range(self.repeat_num):
@@ -204,103 +201,29 @@ class BaseISTDRunner(BaseImageRunner, metaclass=ABCMeta):
             self.forward_image(noisy_image, mask_image, gt_image, frame_callback)
 
     def val_iters(self, iter_index: int, data):
-        import torch
-        import torch.nn.functional as F
         from collections import OrderedDict
-        from src.utils.losses.other_losses import GradientLoss
 
-        grad_loss = GradientLoss()
         val_meters = OrderedDict(tuple(map(lambda item: (item[0], AvgMeter()), self.val_table_items)))
 
-        epoch = int(getattr(self, 'current_epoch', 0))
-        if epoch <= 50:
-            nonshadow_weight = 0.2
-        elif 51 <= epoch <= 200:
-            nonshadow_weight = 0.2 + (epoch - 50) / 150 * 0.8
-        else:
-            nonshadow_weight = 1.0
-        if epoch <= 5:
-            edge_loss_weight = 0.0
-        elif 6 <= epoch <= 15:
-            edge_loss_weight = (epoch - 5) / 10 * 0.03
-        elif 16 <= epoch <= 100:
-            edge_loss_weight = 0.03
-        else:
-            edge_loss_weight = min(0.06, 0.03 + (epoch - 100) / 200 * 0.03)
-        RING_K = 3
-        def _normalize_mask(m: torch.Tensor) -> torch.Tensor:
-            if m.ndim == 2:
-                m = m.unsqueeze(0).unsqueeze(0)
-            elif m.ndim == 3:
-                m = m.unsqueeze(1)
-            m = m.float()
-            if m.shape[1] != 1: m = m[:, :1, :, :]
-            if m.max().item() > 1.0: m = m / 255.0
-            return m.clamp(0, 1)
-        def boundary_ring(mm: torch.Tensor, k=RING_K):
-            dil = F.max_pool2d(mm, kernel_size=k, stride=1, padding=k // 2)
-            ero = 1 - F.max_pool2d(1 - mm, kernel_size=k, stride=1, padding=k // 2)
-            return (dil - ero).clamp(0, 1)
-
-        FINAL_IDX = 0
-        loss_dict = getattr(self, 'loss_dict', {}) or {}
-        perceptual_fns, charbonnier_fns = [], []
-        for name, cfg in loss_dict.items():
-            lname = str(name).lower()
-            fn = cfg.get('loss', None)
-            if callable(fn):
-                if ('percep' in lname) or ('vgg' in lname) or ('lpips' in lname) or ('style' in lname):
-                    perceptual_fns.append(fn)
-                if 'charbon' in lname:
-                    charbonnier_fns.append(fn)
         def frame_callback(output_frame, gt_frame=None, mask_frame=None, noisy_frame=None):
             if isinstance(output_frame, torch.Tensor):
                 output_frame = [output_frame]
-            pred = output_frame[FINAL_IDX]
-            if pred.ndim == 3: pred = pred.unsqueeze(0)
+
+            pred = output_frame[0]
+            if pred.ndim == 3:
+                pred = pred.unsqueeze(0)
+
             gt = gt_frame.unsqueeze(0) if (gt_frame is not None and gt_frame.ndim == 3) else gt_frame
             if gt is None:
                 return
+
             total = self.compute_loss(pred, gt, update_meter=False, training=False).item()
             if val_meters.get('val/total_loss') is not None:
                 val_meters['val/total_loss'].update(total)
 
-            if (mask_frame is not None) and (val_meters.get('val/edge_loss') is not None):
-                m = _normalize_mask(mask_frame)
-                ring = boundary_ring(m, k=RING_K)
-                eps = 1e-6
-                occ_s = m.mean() + eps
-                occ_ns = (1 - m).mean() + eps
-                occ_r = ring.mean() + eps
-                shadow_boost = 1.15 if epoch <= 150 else 1.10
-                alpha_ns = min(nonshadow_weight, 0.8)
-                ring_w = 0.35 if epoch <= 60 else (0.30 if epoch <= 100 else 0.25)
-                Lg_s = grad_loss(pred * m, gt * m) / occ_s
-                Lg_ns = grad_loss(pred * (1 - m), gt * (1 - m)) / occ_ns
-                Lg_r = grad_loss(pred * ring, gt * ring) / occ_r
-                edge_core = shadow_boost * Lg_s + alpha_ns * Lg_ns + ring_w * Lg_r
-                edge_val = (edge_loss_weight * edge_core).item()
-                val_meters['val/edge_loss'].update(edge_val)
-            if (val_meters.get('val/perceptualloss') is not None) and (len(perceptual_fns) > 0):
-                vals = []
-                for fn in perceptual_fns:
-                    v = fn(pred, gt)
-                    v = v.mean().item() if isinstance(v, torch.Tensor) else float(v)
-                    vals.append(v)
-                val_meters['val/perceptualloss'].update(sum(vals) / len(vals))
-            if (val_meters.get('val/charbonnierloss') is not None) and (len(charbonnier_fns) > 0):
-                vals = []
-                for fn in charbonnier_fns:
-                    v = fn(pred, gt)
-                    v = v.mean().item() if isinstance(v, torch.Tensor) else float(v)
-                    vals.append(v)
-                val_meters['val/charbonnierloss'].update(sum(vals) / len(vals))
-            psnr_val = float(self.metrics['psnr'](pred, gt).item())
-            if val_meters.get('val/psnr') is not None:
-                val_meters['val/psnr'].update(psnr_val)
-            self.update_epoch_meter('val/psnr', psnr_val)
         gt_image, noisy_image, mask_image, _ = self.preprocess_data_device(data)
         self.validate_frame(noisy_image, mask_image, gt_image, frame_callback)
+
         return [meter.avg for meter in val_meters.values()]
 
     def forward_image(self,
@@ -354,17 +277,13 @@ class BaseISTDRunner(BaseImageRunner, metaclass=ABCMeta):
     def validate_dataset(self) -> None:
         self.logger.info('Running validation on Large Val Dataset...')
         self.model.eval()
-        self.register_epoch_meter('val/psnr', 'val', '{:.2f} (dB)')
         loss = 0
-        psnr = 0
         index = 0
         for iter_index, data in enumerate(self.val_data_loader):
             self.logger.info('Validating image {:d}...'.format(iter_index))
             result = self.val_iters(iter_index, data)
             loss += result[0]
-            psnr += result[1]
             index += 1
-        self.logger.info('Loss: {}; PSNR: {}...'.format(loss / index, psnr / index))
 
     @torch.no_grad()
     def infer_istd(self, infer_set, results_save_dir: str, max_frame_num: int) -> None:
@@ -407,5 +326,4 @@ class BaseISTDRunner(BaseImageRunner, metaclass=ABCMeta):
         return torch.cat(output_frames_list, dim=0) if len(output_frames_list) != 0 else None
 
     def on_validating_end(self, train_epoch: Optional[int]):
-        if train_epoch is not None:
-            self.save_best_model(train_epoch, 'val/psnr', greater_best=True)
+        pass

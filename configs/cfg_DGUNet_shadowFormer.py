@@ -55,7 +55,7 @@ CFG.TRAIN.DATA.PIN_MEMORY = False
 
 CFG.TRAIN.DATA.DATASETS = EasyDict()
 CFG.TRAIN.DATA.DATASETS.PARAM = {
-    'rgb_dir': './Datasets/ISTD/train/',
+    'rgb_dir': './Datasets/ISTD/train/shadow/',
     'img_options': {'patch_size': 256}
 }
 CFG.TRAIN.DATA.DATASETS.AUG = EasyDict()
@@ -81,8 +81,6 @@ CFG.VAL.TABLE.LIST = [
 ]
 CFG.VAL.TABLE.ITEMS = [
     ('LOSS', '{:.4e}'),
-    ('PSNR', '{:.2f}'),
-    ('SSIM', '{:.4f}'),
 ]
 
 CFG.VAL.DATA = EasyDict()
@@ -92,6 +90,6 @@ CFG.VAL.DATA.PIN_MEMORY = False
 
 CFG.VAL.DATA.DATASETS = EasyDict()
 CFG.VAL.DATA.DATASETS.PARAM = {
-    'rgb_dir': './Datasets/ISTD/test/',
+    'rgb_dir': './Datasets/ISTD/test/shadow/',
     'img_options': {'patch_size': 256}
 }

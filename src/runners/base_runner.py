@@ -46,8 +46,7 @@ class BaseImageRunner(Runner):
         self.val_data_loader = self.build_val_data_loader(cfg)
 
     def init_meters(self) -> None:
-        self.register_epoch_meter('train/psnr', 'train', '{:.2f} (dB)')
-        self.register_epoch_meter('val/psnr', 'val', '{:.2f} (dB)')
+        pass
 
     @staticmethod
     def define_model(cfg: Dict) -> nn.Module:
