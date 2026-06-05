@@ -68,7 +68,7 @@ Datasets/
         └── mask/
 ```
 
-For SRD, the original dataset provides paired shadow and shadow-free images but does not provide official manually annotated shadow masks. Following the baseline setting, we use the **DHAN-generated SRD masks** adopted in the baseline implementation. The masks should be placed in the corresponding `mask/` folders and should have filenames consistent with the input images.
+For SRD, the original dataset provides paired shadow and shadow-free images but does not provide official manually annotated shadow masks. Following the baseline setting, we use the **DHAN-generated SRD masks** adopted in the baseline implementation.
 
 ---
 
