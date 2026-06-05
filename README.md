@@ -134,14 +134,16 @@ The evaluation script was tested with **MATLAB R2016**. Before running the scrip
 For example:
 
 ```matlab
-% Path to the predicted shadow-free images
-result_path = 'path/to/results';
-
-% Path to the ground-truth shadow-free images
-target_path = 'path/to/target';
 
 % Path to the shadow masks
-mask_path = 'path/to/mask';
+maskdir = 'path/to/mask';
+
+% Path to the predicted shadow-free images
+shadowdir = 'path/to/results';
+
+% Path to the ground-truth shadow-free images
+freedir = 'path/to/target';
+
 ```
 
 Then run `evaluate2.m` in MATLAB to obtain the evaluation results.
