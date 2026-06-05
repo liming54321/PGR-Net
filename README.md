@@ -37,7 +37,7 @@ The train/test splits used in this repository strictly follow the original bench
 
 For **ISTD**, the dataset contains **1,330 training triplets** and **540 testing triplets**. Each triplet consists of a shadow image, a corresponding shadow-free image, and a shadow mask.
 
-For **SRD**, the dataset contains **2,680 training pairs** and **408 testing pairs**. Each pair consists of a shadow image and its corresponding shadow-free image. Since the original SRD dataset does not provide official manually annotated shadow masks, the SRD masks used in this repository are taken from the base implementation on which our code is built. As described in that base implementation, the shadow masks for SRD were generated using the **DHAN** method. Therefore, the SRD masks used here should be regarded as DHAN-generated auxiliary masks rather than official manual annotations.
+For **SRD**, the dataset contains **2,680 training pairs** and **408 testing pairs**. Each pair consists of a shadow image and its corresponding shadow-free image. Since the original SRD dataset does not provide official shadow masks, we directly use the **DHAN-provided predicted SRD masks**, i.e., the SRD mask files provided with the base mask-based shadow-removal implementation adopted in this work. According to the description of that implementation, the shadow masks for SRD were generated using the **DHAN** method. These masks have also been adopted in previous mask-based shadow-removal studies and are used as fixed mask priors in our experiments.
 
 Please download the datasets from the following links:
 
