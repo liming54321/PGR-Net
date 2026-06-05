@@ -131,16 +131,12 @@ We provide `evaluate2.m` to compute the quantitative metrics, including **RMSE**
 
 The evaluation script was tested with **MATLAB R2016**. Before running the script, please set the paths of the predicted results, ground-truth images, and shadow masks in `evaluate2.m`.
 
-For example:
-
 ```matlab
 
 % Path to the shadow masks
 maskdir = 'path/to/mask';
-
-% Path to the predicted shadow-free images
+% Path to the results images
 shadowdir = 'path/to/results';
-
 % Path to the ground-truth shadow-free images
 freedir = 'path/to/target';
 
