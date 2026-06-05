@@ -35,7 +35,7 @@ We use the **ISTD** and **SRD** datasets for shadow removal evaluation. In our e
 
 Please download the datasets from the following links:
 
-* ISTD dataset: [[Download link](https://drive.google.com/file/d/17_2AmU5ujm3uh-hNfSPJvOpVxFLcv87m/view?usp=drive_link))
+* ISTD dataset: [[Download link](https://drive.google.com/file/d/17_2AmU5ujm3uh-hNfSPJvOpVxFLcv87m/view?usp=drive_link)
 * SRD dataset: [Download link](https://drive.google.com/file/d/1Sv6yKBQAh3LCGVn16Zy66asuhRI3gVhQ/view?usp=drive_link)
 
 Please organize the ISTD dataset as follows:
