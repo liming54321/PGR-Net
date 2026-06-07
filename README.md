@@ -246,14 +246,32 @@ This project uses the ISTD and SRD datasets. The SRD masks used in this reposito
 
 ## 9. Citation
 
-If you find this repository useful for your research, please consider citing our paper:
+If you find this repository useful for your research, please consider citing our paper and the archived software release.
+
+### Paper
 
 ```bibtex
 @article{li2026progressive,
   title={Progressive Global-to-Local Image Restoration for Structure-Preserving Shadow Removal},
-  author={Li, Ming and Hu, Weijian and Cao, Yali and Li, Lingfang and Zhang, Jikai},
+  author={Li, Ming and Cao, Yali and Li, Lingfang and Zhang, Jikai and Hu, Weijian },
   journal={The Visual Computer},
   year={2026},
   note={Under review}
 }
 ```
+
+### Software
+
+```bibtex
+@software{li2026pgrnet_code,
+  title={PGR-Net: Progressive Global-to-Local Image Restoration for Structure-Preserving Shadow Removal},
+  author={Li, Ming and Cao, Yali and Li, Lingfang and Zhang, Jikai and Hu, Weijian },
+  year={2026},
+  month={jun},
+  publisher={Zenodo},
+  version={v1.0.3},
+  doi={10.5281/zenodo.20578174},
+  url={https://doi.org/10.5281/zenodo.20578174}
+}
+```
+
