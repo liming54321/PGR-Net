@@ -13,6 +13,7 @@ authors:
   - family-names: "Hu"
     given-names: "Weijian"
 version: "1.0.3"
+doi: "10.5281/zenodo.20578174"
 date-released: "2026-06-07"
-repository-code: "你的GitHub仓库链接"
+repository-code: "https://github.com/liming54321/PGR-Net"
 license: "Apache-2.0"
