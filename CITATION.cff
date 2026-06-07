@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the corresponding paper and this software release."
+title: "PGR-Net: Progressive Global-to-Local Image Restoration for Structure-Preserving Shadow Removal"
+authors:
+  - family-names: "Li"
+    given-names: "Ming"
+  - family-names: "Hu"
+    given-names: "Weijian"
+version: "1.0.0"
+date-released: "2026-06-07"
+repository-code: "你的GitHub仓库链接"
+license: "MIT"
